@@ -19,6 +19,8 @@ add_library(${PROJECT_NAME} SHARED
   ${${PROJECT_NAME}_SOURCES}
 )
 
+target_link_libraries(${PROJECT_NAME} ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
+
 install(PROGRAMS
   ${CMAKE_CURRENT_BINARY_DIR}/lib${PROJECT_NAME}.so
   DESTINATION
