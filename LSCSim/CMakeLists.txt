@@ -33,12 +33,16 @@ set(LINK_EXTERNALS ${ROOT_LIBRARIES} ${Geant4_LIBRARIES})
 
 file(GLOB ${PROJECT_NAME}_EXECUTABLES ${PROJECT_SOURCE_DIR}/test/*.cc)
 
-foreach(testsourcefile ${${PROJECT_NAME}_EXECUTABLES})
-  get_filename_component(testname ${testsourcefile} NAME_WE)
-  add_executable(${testname} ${testsourcefile})
-  target_link_libraries(${testname} ${LINK_PACKAGES} ${LINK_EXTERNALS})
-  install(TARGETS ${testname} DESTINATION ${CMAKE_INSTALL_BINDIR})
-endforeach(testsourcefile ${${PROJECT_NAME}_EXECUTABLES})
+# 1. lscsim.cc → main 실행파일
+add_executable(main ${PROJECT_SOURCE_DIR}/test/lscsim.cc)
+target_link_libraries(main LSCSim ${LINK_PACKAGES} ${LINK_EXTERNALS})
+install(TARGETS main DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+# 2. different.cc → main2 실행파일
+add_executable(main2 ${PROJECT_SOURCE_DIR}/test/different.cc)
+target_link_libraries(main2 LSCSim ${LINK_PACKAGES} ${LINK_EXTERNALS})
+install(TARGETS main2 DESTINATION ${CMAKE_INSTALL_BINDIR})
+
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/mac DESTINATION ${CMAKE_INSTALL_PREFIX})
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/data DESTINATION ${CMAKE_INSTALL_PREFIX})

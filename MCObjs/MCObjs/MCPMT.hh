@@ -37,4 +37,5 @@ inline int MCPMT::GetId() const { return fPMTId; }
 inline int MCPMT::GetNHit() const { return GetEntriesFast(); }
 inline MCPhotonHit * MCPMT::GetHit(int n) const { return (MCPhotonHit *)At(n); }
 
+
 #endif

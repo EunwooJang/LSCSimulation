@@ -3,6 +3,7 @@
 #include "G4MaterialTable.hh"
 #include "G4NistManager.hh"
 #include "G4OpticalSurface.hh"
+
 #include "GLG4Sim/GLG4InputDataReader.hh"
 #include "LSCSim/LSCDetectorConstruction.hh"
 
@@ -34,6 +35,10 @@ void LSCDetectorConstruction::ConstructMaterials()
   G4Element * elementNb = man->FindOrBuildElement("Nb", isotope);
   G4Element * elementAu = man->FindOrBuildElement("Au", isotope);
   G4Element * elementGe = man->FindOrBuildElement("Ge", isotope);
+  G4Element * elementMn = man->FindOrBuildElement("Mn", isotope);
+  G4Element * elementCo = man->FindOrBuildElement("Co", isotope);
+
+
 
   // ... insert any additional material definitions here
   G4String name;
@@ -106,6 +111,20 @@ void LSCDetectorConstruction::ConstructMaterials()
   stainless->AddElement(elementCr, 0.19);
   stainless->AddElement(elementNi, 0.10);
 
+  name = "Steel_polished";
+  density = 7.87 * g / cm3;
+  nelements = 1;
+
+  auto steel_polished = new G4Material(name, density, nelements);
+  steel_polished->AddMaterial(stainless, 1);
+
+  name = "Steel_unpolished";
+  density = 7.87 * g / cm3;
+  nelements = 1;
+
+  auto steel_unpolished = new G4Material(name, density, nelements);
+  steel_unpolished->AddMaterial(stainless, 1);
+
   // --- Lead  Pb ------
   name = "Lead";
   density = 11.35 * g / cm3;
@@ -129,6 +148,48 @@ void LSCDetectorConstruction::ConstructMaterials()
 
   auto copper = new G4Material(name, density, nelements);
   copper->AddElement(elementCu, natoms = 1);
+
+  // --- Germanium (Ge-68) ---
+  name = "Ge68";
+  density = 5.323 * g / cm3;  // solid Ge
+  nelements = 1;
+  auto Ge68 = new G4Material(name, density, nelements);
+  Ge68->AddElement(G4Element::GetElement("Ge"), natoms = 1);
+
+  // --- Sodium (Na-22) ---
+  name = "Na22";
+  density = 0.97 * g / cm3;  // metallic sodium (soft metal)
+  nelements = 1;
+  auto Na22 = new G4Material(name, density, nelements);
+  Na22->AddElement(G4Element::GetElement("Na"), natoms = 1);
+
+  // --- Manganese (Mn-54) ---
+  name = "Mn54";
+  density = 7.43 * g / cm3;  // metallic Mn
+  nelements = 1;
+  auto Mn54 = new G4Material(name, density, nelements);
+  Mn54->AddElement(G4Element::GetElement("Mn"), natoms = 1);
+
+  // --- Cesium (Cs-137) ---
+  name = "Cs137";
+  density = 1.93 * g / cm3;  // solid Cs
+  nelements = 1;
+  auto Cs137 = new G4Material(name, density, nelements);
+  Cs137->AddElement(G4Element::GetElement("Cs"), natoms = 1);
+
+  // --- Cobalt (Co-60) ---
+  name = "Co60";
+  density = 8.90 * g / cm3;  // metallic cobalt
+  nelements = 1;
+  auto Co60 = new G4Material(name, density, nelements);
+  Co60->AddElement(G4Element::GetElement("Co"), natoms = 1);
+
+  // --- Potassium (K-40) ---
+  name = "K40";
+  density = 0.86 * g / cm3;  // metallic potassium
+  nelements = 1;
+  auto K40 = new G4Material(name, density, nelements);
+  K40->AddElement(G4Element::GetElement("K"), natoms = 1);
 
   //               H H
   // --- Acrylic  -C-C- --------------------
@@ -355,19 +416,27 @@ void LSCDetectorConstruction::ConstructMaterials()
   Photocathode_opsurf->SetMaterialPropertiesTable(
       G4Material::GetMaterial("photocathode")->GetMaterialPropertiesTable());
 
-  Stainless_opsurf = new G4OpticalSurface("Stainless_opsurf");
+  Stainless_opsurf = new G4OpticalSurface("steel_polished_opsurf");
   Stainless_opsurf->SetFinish(polished);
   Stainless_opsurf->SetModel(glisur);
   Stainless_opsurf->SetType(dielectric_metal);
   Stainless_opsurf->SetPolish(0.95); // a guess -- FIXME?
   Stainless_opsurf->SetMaterialPropertiesTable(
-      stainless->GetMaterialPropertiesTable());
+      steel_polished->GetMaterialPropertiesTable());
+
+  Stainless_opsurf = new G4OpticalSurface("steel_unpolished_opsurf");
+  Stainless_opsurf->SetFinish(ground);
+  Stainless_opsurf->SetModel(glisur);
+  Stainless_opsurf->SetType(dielectric_metal);
+  Stainless_opsurf->SetPolish(0.1); // a guess -- FIXME?
+  Stainless_opsurf->SetMaterialPropertiesTable(
+      steel_unpolished->GetMaterialPropertiesTable());
 
   Polyethylene_opsurf = new G4OpticalSurface("Polyethylene_opsurf");
-  Polyethylene_opsurf->SetFinish(ground);              // a guess -- FIXME?
-  Polyethylene_opsurf->SetModel(glisur);               // a guess -- FIXME?
-  Polyethylene_opsurf->SetType(dielectric_dielectric); // a guess -- FIXME?
-  Polyethylene_opsurf->SetPolish(0.7);                 // a guess -- FIXME?
+  Polyethylene_opsurf->SetFinish(ground);         // a guess -- FIXME?
+  Polyethylene_opsurf->SetModel(glisur);          // a guess -- FIXME?
+  Polyethylene_opsurf->SetType(dielectric_metal); // a guess -- FIXME?
+  Polyethylene_opsurf->SetPolish(0.7);            // a guess -- FIXME?
   Polyethylene_opsurf->SetMaterialPropertiesTable(
       polyethylene->GetMaterialPropertiesTable());
 

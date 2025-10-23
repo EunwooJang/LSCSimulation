@@ -44,7 +44,9 @@ void LSCPMTSD::SimpleHit(G4int ipmt, G4double time, G4double kineticEnergy,
                           const G4ThreeVector & hit_position,
                           const G4ThreeVector & hit_momentum,
                           const G4ThreeVector & hit_polarization,
-                          G4int iHitPhotonCount)
+                          G4int iHitPhotonCount,
+                          G4int trackId,
+                          G4int parentTrackId)
 {
   PMTHit * pmt = nullptr;
 
@@ -62,9 +64,18 @@ void LSCPMTSD::SimpleHit(G4int ipmt, G4double time, G4double kineticEnergy,
     fPMTHitCollection->insert(pmt);
   }
 
-  MCPhotonHit * hit = pmt->AddHit();
-  hit->SetTime((float)time);
-  hit->SetKineticEnergy((float)kineticEnergy);
+  // For Npe > 1 Events
+  for (int i = 0; i < iHitPhotonCount; i++) {
+    MCPhotonHit * hit = pmt->AddHit();
+    hit->SetTime((float)time);
+    hit->SetKineticEnergy((float)kineticEnergy);
+    hit->SetTrackId(trackId);              // 추가
+    hit->SetParentTrackId(parentTrackId);  // 추가
+  }
+
+  // MCPhotonHit * hit = pmt->AddHit();
+  // hit->SetTime((float)time);
+  // hit->SetKineticEnergy((float)kineticEnergy);
 }
 
 void LSCPMTSD::EndOfEvent(G4HCofThisEvent *) {}

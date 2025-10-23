@@ -1,13 +1,17 @@
+#/run/numberOfThreads 16
 /control/verbose 1
-#/event/verbose 1
+/event/verbose 0
+/tracking/verbose 0
+/process/verbose 0
 
-/tracking/storeTrajectory 1
+/tracking/storeTrajectory 0
+
 
 /LSC/det/detector PROTO
 /LSC/det/geomcheck 0
-/LSC/det/geometrydata /home/cupsoft/Devs/lscdev/LSCSimulation/LSCSim/data/geometry_prototype.dat
-/LSC/det/materialdata /home/cupsoft/Devs/lscdev/LSCSimulation/LSCSim/data/materials.dat
-/LSC/det/pmtposdata /home/cupsoft/Devs/lscdev/LSCSimulation/LSCSim/data/pmtpos_prototype.dat
+/LSC/det/geometrydata /proj/internal_group/cup/eunwoo/my_sim/lscsimulation/LSCSimulation/LSCSim/data/geometry_prototype.dat
+/LSC/det/materialdata /proj/internal_group/cup/eunwoo/my_sim/lscsimulation/LSCSimulation/LSCSim/data/materials.dat
+/LSC/det/pmtposdata /proj/internal_group/cup/eunwoo/my_sim/lscsimulation/LSCSimulation/LSCSim/data/pmtpos_reno.dat
 
 /LSC/ROOT/savetrackopt  0
 /LSC/ROOT/savestepopt  0
@@ -16,12 +20,50 @@
 
 /run/initialize
 
+# /hits/verbose 2
+/PMTOpticalModel/verbose 10
+
 /LSC/Scintillation/scinton 1
 /LSC/Cerenkov/cerenkovon 1
 
 /process/activate DeferTrackProc
 
+/generator/list
+
 /generator/event_window 5000
-/generator/rates 3 1
-/generator/pos/set 9 "0 0 0"
-/generator/vtx/set 17 "gamma 0 0 0 1"
+/generator/pos/set 9 "0 0 0" 
+
+/generator/rates 3 1E-10
+/generator/vtx/set 17 "e- 0 0 0 1"
+
+
+# Natural Materials
+
+#--
+# /generator/rates 3 4.92E-18
+# /generator/vtx/set 17 "U238 0 0 0 0"
+
+#/generator/rates 3 1.56E-18
+#/generator/vtx/set 17 "Th232 0 0 0 0"
+
+#/generator/rates 3 1.76E-17
+#/generator/vtx/set 17 "K40 0 0 0 0"
+#--
+
+#/generator/rates 3 2.10E-06
+#/generator/vtx/set 17 "Rn222 0 0 0 0"
+
+#/generator/rates 3 4.46E-19
+#/generator/vtx/set 17 "Rb87 0 0 0 0"
+
+# Point Source
+# /generator/rates 3 5.08E-11
+# /generator/vtx/set 17 "Am241 0 0 0 0"
+
+# /generator/rates 3 4.17E-09
+# /generator/vtx/set 17 "Co60 0 0 0 0"
+
+# /generator/rates 3 7.28E-10
+# /generator/vtx/set 17 "Cs137 0 0 0 0"
+
+

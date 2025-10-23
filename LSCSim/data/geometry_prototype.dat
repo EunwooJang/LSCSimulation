@@ -15,4 +15,15 @@ target_radius 60
 target_height 120
 target_thickness 1
 
+acrylic_radius 0.5
+acrylic_height 1
+acrylic_pos_radius 0
+acrylic_pos_theta 0
+acrylic_pos_height 10
 
+source_type 4
+source_radius 0.3
+source_height 0.4
+source_pos_height_offset 0
+
+reflector_on 0

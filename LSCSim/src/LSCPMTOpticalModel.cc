@@ -451,9 +451,14 @@ void LSCPMTOpticalModel::DoIt(const G4FastTrack & fastTrack,
     }
 
     if (N_pe > 0) {
+
+      // Track ID 정보 가져오기
+      G4int trackId = fastTrack.GetPrimaryTrack()->GetTrackID();
+      G4int parentTrackId = fastTrack.GetPrimaryTrack()->GetParentID();
+
       if (detector != NULL && detector->isActive())
         ((LSCPMTSD *)detector)
-            ->SimpleHit(ipmt, time, energy, pos, dir, pol, N_pe);
+            ->SimpleHit(ipmt, time, energy, pos, dir, pol, N_pe, trackId, parentTrackId);
       if (_verbosity >= 2) {
         G4cout << "LSCPMTOpticalModel made " << N_pe << " pe\n";
       }

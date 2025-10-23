@@ -1,5 +1,5 @@
 R__LOAD_LIBRARY(libHist)
-R__LOAD_LIBRARY(libTrgSim)
+//R__LOAD_LIBRARY(libTrgSim)
 
 void digi_example()
 {

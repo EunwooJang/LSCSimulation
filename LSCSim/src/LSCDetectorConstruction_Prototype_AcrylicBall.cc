@@ -2,6 +2,7 @@
 #include <sstream>
 #include <string>
 
+#include "G4Sphere.hh"
 #include "G4Box.hh"
 #include "G4LogicalBorderSurface.hh"
 #include "G4LogicalVolume.hh"
@@ -20,10 +21,11 @@
 using namespace std;
 using namespace CLHEP;
 
-void LSCDetectorConstruction::ConstructDetector_Prototype(
+void LSCDetectorConstruction::ConstructDetector_Prototype_AcrylicBall(
     G4VPhysicalVolume * worldphys, LSCPMTSD * pmtsd, GLG4param & geom_db)
 {
   auto WorldLog = worldphys->GetLogicalVolume();
+
 
   // Buffer
   G4double bufferR = cm * geom_db["buffer_radius"];
@@ -65,8 +67,59 @@ void LSCDetectorConstruction::ConstructDetector_Prototype(
   auto TargetLSPhys = new G4PVPlacement(0, G4ThreeVector(), TargetLSLog, "TargetLSPhys", TargetTankLog, false, 0, fGeomCheck);
 
 
+  //  Acrylic Ball  
+  G4double acrylicR = cm * geom_db["acrylic_radius"];
+  G4double acrylicH = cm * geom_db["acrylic_height"];
+  G4double acrylic_pos_r     = cm * geom_db["acrylic_pos_radius"];
+  G4double acrylic_pos_theta = deg * geom_db["acrylic_pos_theta"];
+  G4double acrylic_pos_z     = cm * geom_db["acrylic_pos_height"];
+  G4ThreeVector acrylic_pos(acrylic_pos_r * std::cos(acrylic_pos_theta), acrylic_pos_r * std::sin(acrylic_pos_theta), acrylic_pos_z);
 
+  auto AcrylicCylSolid = new G4Tubs("AcrylicCylSolid", 0.0, acrylicR, acrylicH / 2.0, 0.0 * deg, 360.0 * deg);
+  auto AcrylicCylLog = new G4LogicalVolume(AcrylicCylSolid, G4Material::GetMaterial("Acrylic"), "AcrylicCylLog");
+  auto acrylic_vis = new G4VisAttributes(G4Color(0.7, 0.9, 1.0, 0.4));
+  acrylic_vis->SetForceSolid(true);
+  AcrylicCylLog->SetVisAttributes(acrylic_vis);
+  auto AcrylicCylPhys = new G4PVPlacement(0, acrylic_pos, AcrylicCylLog, "AcrylicCylPhys", TargetLSLog, false, 0, fGeomCheck);
 
+  // Source Cylinder
+  G4double sourceR = cm * geom_db["source_radius"];
+  G4double sourceH = cm * geom_db["source_height"];
+  G4double source_pos_height_offset = cm * geom_db["source_pos_height_offset"];
+  
+  G4int source_code = (G4int)geom_db["source_type"];
+  G4String source_type;
+
+  switch (source_code) {
+    case 1: source_type = "Co60"; break;
+    case 2: source_type = "Cs137"; break;
+    case 3: source_type = "Na22"; break;
+    case 4: source_type = "Ge68"; break;
+    case 5: source_type = "Mn54"; break;
+    case 6: source_type = "K40"; break;
+    default:
+      G4cout << "[WARN] Unknown source_type code = " << source_code
+             << ", defaulting to Co60." << G4endl;
+      source_type = "Co60";
+      break;
+  }
+
+  G4cout << "[INFO] Selected source_type = " << source_type << G4endl;
+  G4Material* SourceMaterial = G4Material::GetMaterial(source_type);
+
+  if (!SourceMaterial) {
+    G4cout << "[WARN] Source material '" << source_type 
+           << "' not found. Using Acrylic as fallback." << G4endl;
+    SourceMaterial = G4Material::GetMaterial("Acrylic");
+  }
+
+  auto SourceCylSolid = new G4Tubs("SourceCylSolid", 0.0, sourceR, sourceH / 2.0, 0.0 * deg, 360.0 * deg);
+  G4ThreeVector source_pos =  G4ThreeVector(0, 0, source_pos_height_offset);
+  auto SourceCylLog = new G4LogicalVolume(SourceCylSolid, SourceMaterial, "SourceCylLog");
+  auto source_vis = new G4VisAttributes(G4Color(1.0, 0.3, 0.3, 0.6));
+  source_vis->SetForceSolid(true);
+  SourceCylLog->SetVisAttributes(source_vis);
+  auto SourceCylPhys = new G4PVPlacement(0, source_pos, SourceCylLog, "SourceCylPhys", AcrylicCylLog, false, 0, fGeomCheck);
 
 
   if (fPMTPositionDataFile.empty()) {

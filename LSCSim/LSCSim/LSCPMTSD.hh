@@ -24,7 +24,9 @@ public:
 
   void SimpleHit(G4int ipmt, G4double time, G4double kineticEnergy,
                  const G4ThreeVector & position, const G4ThreeVector & momentum,
-                 const G4ThreeVector & polarization, G4int iHitPhotonCount);
+                 const G4ThreeVector & polarization, G4int iHitPhotonCount, 
+                 G4int trackId,
+                 G4int parentTrackId);
 
 private:
   PMTHitsCollection * fPMTHitCollection;

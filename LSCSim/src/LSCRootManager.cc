@@ -27,6 +27,7 @@
 #include "MCObjs/MCScint.hh"
 #include "MCObjs/MCScintStep.hh"
 #include "MCObjs/MCTrack.hh"
+#include "GLG4Sim/GLG4PrimaryGeneratorAction.hh"
 
 using namespace std;
 using namespace CLHEP;
@@ -135,6 +136,20 @@ void LSCRootManager::EndOfEvent(const G4Event * anEvent)
   G4int eventId = anEvent->GetEventID() + 1; // event number starts from 1
 
   fEventInfo->SetEventNumber(eventId);
+  
+
+  // GLG4PrimaryGeneratorAction으로부터 시간 정보 가져오기
+  GLG4PrimaryGeneratorAction * generator =
+      GLG4PrimaryGeneratorAction::GetTheGLG4PrimaryGeneratorAction();
+
+  if (generator) {
+    // 이전 이벤트로부터의 시간 간격 저장 (높은 정밀도 유지)
+    fEventInfo->SetTimeSincePriorEvent(generator->GetUniversalTimeSincePriorEvent());
+
+    // 절대 시간도 저장 (옵션)
+    fEventInfo->SetUniversalTime(generator->GetUniversalTime());
+  }
+
 
   // primary vertex
   G4int npvx = anEvent->GetNumberOfPrimaryVertex();
@@ -185,13 +200,15 @@ void LSCRootManager::EndOfEvent(const G4Event * anEvent)
           MCPhotonHit * ph = pmt->GetHit(j);
           mcpmt->AddHit(ph);
         }
+        mcpmt->Sort();
       }
     }
   }
 
   fEventTree->Fill();
 
-  G4cout << std::setw(12) << eventId << " events processed ..." << G4endl;
+  if (eventId > 0 && eventId % 100 ==0)
+    G4cout << std::setw(12) << eventId << " events processed ..." << G4endl;
 }
 
 void LSCRootManager::RecordTrack(const G4Track * gtrack)
