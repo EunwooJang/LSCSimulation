@@ -13,6 +13,7 @@ include(${ROOT_USE_FILE})
 #
 find_package(Geant4 REQUIRED ui_all vis_all)
 include(${Geant4_USE_FILE})
+include_directories(${Geant4_INCLUDE_DIRS})
 
 # -----------------------------------------------------------------------------
 
